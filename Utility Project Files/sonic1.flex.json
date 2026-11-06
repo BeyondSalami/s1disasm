@@ -467,7 +467,7 @@
                         }
                     ],
                     "isDirectory": true,
-                    "expanded": false,
+                    "expanded": true,
                     "config": {}
                 },
                 {
@@ -1129,7 +1129,7 @@
                 }
             ],
             "isDirectory": true,
-            "expanded": false,
+            "expanded": true,
             "config": {}
         },
         {
@@ -3421,7 +3421,7 @@
                 }
             ],
             "isDirectory": true,
-            "expanded": false,
+            "expanded": true,
             "config": {}
         },
         {
@@ -3865,7 +3865,7 @@
                         }
                     ],
                     "isDirectory": true,
-                    "expanded": false,
+                    "expanded": true,
                     "config": {}
                 },
                 {

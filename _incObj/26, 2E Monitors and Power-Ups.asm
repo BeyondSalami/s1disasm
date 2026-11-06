@@ -385,6 +385,12 @@ Pow_RingSound:
 Pow_ChkS:
 		cmpi.b	#7,d0					; does monitor contain 'S'?
 		bne.s	Pow_ChkGoggles				; if not, branch
+
+		move.b	#1,(v_invinc).w				; make Sonic invincible
+
+		move.w	#son_maxspeed*2,(v_sonspeedmax).w	; double Sonic's top speed
+		move.w	#son_acceleration*2,(v_sonspeedacc).w	; double Sonic's acceleration
+		
 		nop						; 'S' does nothing by default
 ; ===========================================================================
 
