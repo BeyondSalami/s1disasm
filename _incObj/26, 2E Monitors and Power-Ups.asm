@@ -108,6 +108,8 @@ Mon_Solid:	; Routine 2
 		beq.s	.checkpush				; if yes, branch
 
 ; loc_A20A:
+		tst.b	spindash_flag(a1)			; is spindash flag set?
+		bne.s	.checkpush				; if yes, branch
 .dontbreak:
 		tst.w	d1					; has Sonic touched the monitor from the sides?
 		bpl.s	.sidetouch				; if yes, branch

@@ -31,9 +31,9 @@ v_spritequeue:		ds.b	spritelayer_num*spritelayer_size ; sprite display queue, in
 
 v_16x16:		ds.b	$1800				; 16x16 tile mappings
 
-v_sgfx_buffer:		ds.b	tile_size*23			; buffered Sonic graphics ($17 cells)
-v_sgfx_buffer_end:
-			ds.b	$20				; unused
+VDP_Command_Buffer:	ds.w	7*$12				; stores 18 ($12) VDP commands to issue the next time ProcessDMAQueue is called
+VDP_Command_Buffer_Slot:ds.l	1				; stores the address of the next open slot for a queued VDP command
+			ds.b	$200				; unused ($200 were freed up by the new DMA Queue)
 v_tracksonic:		ds.b	$100				; position tracking data for Sonic
 v_hscrolltablebuffer:	ds.b	$380				; scrolling table data
 v_hscrolltablebuffer_end:
@@ -291,7 +291,11 @@ v_ringbonus:		ds.w	1				; ring bonus at the end of an act
 f_endactbonus:		ds.b	1				; time/ring bonus update flag at the end of an act
 v_sonicend:		ds.b	1				; routine counter for Sonic in the ending sequence
 v_lz_deform:		ds.w	1				; LZ deformation offset, in units of $80
-			ds.b	6				; unused
+			v_cam_x_delay:		ds.w	1				; (word) horizontal camera delay timer after a Spin Dash
+			v_cam_y_delay:		ds.b	1				; vertical camera delay when looking up/down
+			v_spindash_sfx_flag:	ds.b	1				; set to 1 if the Spin Dash sound was the last one played and 0 if it was not
+			v_spindash_sfx_timer:	ds.b	1				; timer to reset the Spin Dash rev pitch after a second of inactivity
+			v_spindash_sfx_pitch:	ds.b	1				; current Spin Dash rev pitch value
 f_switch:		ds.b	$10				; flags set when Sonic stands on a switch
 v_scroll_block_1_size:	ds.w	1
 v_scroll_block_2_size:	ds.w	1				; unused

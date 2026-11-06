@@ -16,6 +16,8 @@ PSG_Sample_Rate:	equ Z80_Clock/16
 ; VDP addresses
 vdp_data_port:		equ $C00000
 vdp_control_port:	equ $C00004
+VDP_data_port:		equ vdp_data_port
+VDP_control_port: 	equ vdp_control_port
 vdp_counter:		equ $C00008
 psg_input:		equ $C00011
 debug_reg:		equ $C0001C
@@ -301,6 +303,9 @@ shoetime:		equ $34					; time left for speed shoes (2 bytes)
 angleright:		equ $36					; angle of floor on Sonic's right side
 angleleft:		equ $37					; angle of floor on Sonic's left side
 sticktoconvex:		equ $38					; flag set while running on an SBZ gear
+spindash_flag:		equ $39					; Spin Dash flag
+spindash_count:		equ $3A					; Spin Dash rev counter
+spindash_decay:		equ $3B					; Spin Dash rev decay timer
 ;unused:		equ $39					; unused by Sonic
 restartime:		equ $3A					; time left before level restarts after dying (2 bytes)
 jumping:		equ $3C					; flag set while Sonic is jumping
