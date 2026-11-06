@@ -27,7 +27,6 @@ palid_SYZ:		makePalEntry	Pal_SYZ,		v_palette_line_2
 palid_SBZ1:		makePalEntry	Pal_SBZ1, 		v_palette_line_2
 	zonewarning Pal_Levels,8
 
-palid_GHZ1:		makePalEntry	Pal_GHZ1, 		v_palette_line_2
 palid_Special:		makePalEntry	Pal_Special, 		v_palette_line_1
 palid_LZWater:		makePalEntry	Pal_LZWater, 		v_palette_line_1
 palid_SBZ3:		makePalEntry	Pal_SBZ3, 		v_palette_line_2
@@ -66,4 +65,3 @@ Pal_SBZ3SonWat:		bincludeEndMarker	"palette/Sonic - SBZ3 Underwater.bin"
 Pal_SSResult:		bincludeEndMarker	"palette/Special Stage Results.bin"
 Pal_Continue:		bincludeEndMarker	"palette/Special Stage Continue Bonus.bin"
 Pal_Ending:		bincludeEndMarker	"palette/Ending.bin"
-Pal_GHZ1:		bincludeEndMarker	"palette/Green Hill Zone 1.bin"
