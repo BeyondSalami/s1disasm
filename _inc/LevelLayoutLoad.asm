@@ -34,17 +34,6 @@ LevelDataLoad:
 		move.w	(a2),d0					; load palette ID
 		andi.w	#$FF,d0					; only use lower byte (palette ID is duplicated in headers)
 
-		cmpi.w	#id_LZ_act4,(v_zone_act).w		; is level SBZ3 (LZ4)?
-		bne.s	.notSBZ3				; if not, branch
-		moveq	#palid_SBZ3,d0				; use SB3 palette instead
-	.notSBZ3:
-		cmpi.w	#id_SBZ_act2,(v_zone_act).w		; is level SBZ2?
-		beq.s	.isSBZorFZ				; if yes, branch
-		cmpi.w	#id_FZ,(v_zone_act).w			; is level FZ?
-		bne.s	.normalpal				; if not, branch
-	.isSBZorFZ:
-		moveq	#palid_SBZ2,d0				; use SBZ2/FZ palette instead
-	.normalpal:
 		bsr.w	PalLoad_Fade				; load specified palette into fade-in buffer
 
 	; --- 2nd PLC ---

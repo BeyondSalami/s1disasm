@@ -2730,11 +2730,7 @@ Level_NoMusicFade:
 		bsr.w	NemDec					; decompress Nemesis-compressed patterns directly to VRAM
 		enable_ints					; enable interrupts again
 
-		moveq	#0,d0					; clear d0
-		move.b	(v_zone).w,d0				; get current Zone ID
-		lsl.w	#4,d0					; multiply by $10 (number of bytes per level header entry)
-		lea	(LevelHeaders).l,a2			; load level headers
-		lea	(a2,d0.w),a2				; get relevant header for current level
+		jsr	(GetLevelHeader).l			; load level header for current zone/act into a2
 		moveq	#0,d0					; clear d0
 		move.b	(a2),d0					; get first PLC entry
 		beq.s	Level_NoPLC				; if it's null, branch (never the case)
@@ -3114,26 +3110,11 @@ Level_FDLoop_NoDim:
 ; ---------------------------------------------------------------------------
 
 ColIndexLoad:
-		moveq	#0,d0					; clear d0
-		move.b	(v_zone).w,d0				; get current zone ID
-		lsl.w	#2,d0					; multiply by 4 for long-based indexing
-		move.l	ColPointers(pc,d0.w),(v_collindex).w	; set collision index pointer for current zone
-		rts						; return
-; End of function ColIndexLoad
-
-; ---------------------------------------------------------------------------
-; Collision index pointers
-; ---------------------------------------------------------------------------
-
-ColPointers:	dc.l Col_GHZ
-		dc.l Col_LZ
-		dc.l Col_MZ
-		dc.l Col_SLZ
-		dc.l Col_SYZ
-		dc.l Col_SBZ
-		zonewarning ColPointers,4
-		; The ending doesn't get an entry, as it's hardcoded to use Col_GHZ
-		even
+		jsr	(GetLevelHeader).l			; load level header for current zone/act into a2
+		move.l	$C(a2),d0				; get collision/palette entry from level header
+		lsr.l	#8,d0					; shift out palette to only have collision index left
+		move.l	d0,(v_collindex).w			; write collision index to RAM
+		rts
 
 ; ===========================================================================
 ; >>> Routines to set and update values that change on a fixed timer
@@ -3870,11 +3851,7 @@ GM_Credits:
 
 		bsr.w	EndingDemoLoad				; prepare loading the next ending demo
 
-		moveq	#0,d0					; clear d0
-		move.b	(v_zone).w,d0				; get zone ID for next credits demo
-		lsl.w	#4,d0					; multiply by $10 (number of bytes per level header entry)
-		lea	(LevelHeaders).l,a2			; load level headers
-		lea	(a2,d0.w),a2				; get relevant header for next credits demo
+		jsr	(GetLevelHeader).l			; load level header for current zone/act into a2
 		moveq	#0,d0					; clear d0
 		move.b	(a2),d0					; get first PLC entry
 		beq.s	Cred_SkipObjGfx				; if it's null, branch (never the case)
