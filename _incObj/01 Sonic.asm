@@ -45,6 +45,7 @@ Sonic_Main:	; Routine 0
 		move.w	#son_maxspeed,(v_sonspeedmax).w		; set Sonic's top speed
 		move.w	#son_acceleration,(v_sonspeedacc).w	; set Sonic's acceleration
 		move.w	#son_deceleration,(v_sonspeeddec).w	; set Sonic's deceleration
+		move.b	#id_SpinDust,(v_dustobj).w		; prepare Spin Dash dust object
 ; ---------------------------------------------------------------------------
 
 ; Obj01_Control:
@@ -315,6 +316,7 @@ Sonic_Water:
 
 ; Obj01_MdNormal:
 Sonic_MdNormal:	; While Sonic is on the ground and not rolling
+		bsr.w	Sonic_Peelout
 		bsr.w	Sonic_SpinDash
 		bsr.w	Sonic_Jump				; check if we need to jump
 		bsr.w	Sonic_SlopeResistWalk			; handle resistance from running up slopes
@@ -329,6 +331,7 @@ Sonic_MdNormal:	; While Sonic is on the ground and not rolling
 
 ; Obj01_MdJump:
 Sonic_MdJump:	; While Sonic is in the air but not rolling
+		bclr	#1,spindash_flag(a0)
 		bclr	#0,spindash_flag(a0)			; clear Spin Dash flag
 		bsr.w	Sonic_JumpHeight			; handle Sonic's jump height based on whether the jump button is still held
 		bsr.w	Sonic_JumpDirection			; handle midair direction adjustments while jumping
@@ -359,6 +362,7 @@ Sonic_MdRoll:	; While Sonic is on the ground and rolling
 
 ; Obj01_MdJump2:
 Sonic_MdJump2:	; While Sonic is in the air and rolling (usually, but not limited to, jumping)
+		bclr	#1,spindash_flag(a0)
 		bclr	#0,spindash_flag(a0)			; clear Spin Dash flag
 		bsr.w	Sonic_JumpHeight			; handle Sonic's jump height based on whether the jump button is still held
 		bsr.w	Sonic_JumpDirection			; handle midair direction adjustments while jumping
@@ -666,6 +670,9 @@ Sonic_MoveLeft:
 		neg.w	d1					; negate it for left-side check
 		cmp.w	d1,d0					; is new speed above max speed?
 		bgt.s	.nocap					; if not, branch
+		add.w	d5,d0			; +++ remove this frame's acceleration change
+		cmp.w	d1,d0			; +++ compare speed with top speed
+		ble.s	.nocap			; +++ if speed was already greater than the maximum, branch
 		move.w	d1,d0					; cap Sonic's ground speed
 
 ; loc_130A6:
@@ -730,6 +737,9 @@ Sonic_MoveRight:
 		add.w	d5,d0					; add acceleration to current ground speed
 		cmp.w	d6,d0					; is new speed above max speed?
 		blt.s	.nocap					; if not, branch
+		sub.w	d5,d0					; remove this frame's acceleration change
+		cmp.w	d6,d0					; compare speed with top speed
+		bge.s	.nocap					; if speed was already greater than the maximum, branch
 		move.w	d6,d0					; cap Sonic's ground speed
 
 ; loc_1310C:
@@ -977,6 +987,9 @@ Sonic_JumpDirection:
 		neg.w	d1					; negate it for leftward movement check
 		cmp.w	d1,d0					; is new speed exceeding maximum?
 		bgt.s	.notleft				; if not, branch
+		add.w	d5,d0			; +++ remove this frame's acceleration change
+		cmp.w	d1,d0			; +++ compare speed with top speed
+		ble.s	.notleft		; +++ if speed was already greater than the maximum, branch
 		move.w	d1,d0					; cap leftward X-speed to maximum
 
 ; loc_13278:
@@ -987,6 +1000,9 @@ Sonic_JumpDirection:
 		add.w	d5,d0					; increase rightward movement speed
 		cmp.w	d6,d0					; is new speed exceeding maximum?
 		blt.s	Sonic_JumpMove				; if not, branch
+		sub.w	d5,d0						; +++ remove this frame's acceleration change
+		cmp.w	d6,d0						; +++ compare speed with top speed
+		bge.s	Sonic_JumpMove				; +++ if speed was already greater than the maximum, branch
 		move.w	d6,d0					; cap rightward X-speed to maximum
 
 ; Obj01_JumpMove:
@@ -2289,6 +2305,10 @@ Sonic_Animate:
 
 ; loc_13A9C:
 .nomodspeed:
+		lea	(SonAni_Figure8).l,a1			; use figure-8 running animation
+		cmpi.w	#$A00,d2				; is Sonic at running REALLY fast?
+		bhs.s	.running				; if yes, branch
+
 		lea	(SonAni_Run).l,a1			; use running animation
 		cmpi.w	#$600,d2				; is Sonic at running speed?
 		bhs.s	.running				; if yes, branch
@@ -2407,10 +2427,6 @@ Sonic_LoadGfx:
 ; ---------------------------------------------------------------------------
 ; Subroutine to charge and release a Spin Dash
 ; ---------------------------------------------------------------------------
-; Temporary equates until we add the proper Spin Dash sprites and SFX.
-; This stuff will be removed later in the tutorial.
-sfx_SpinDash:	equ sfx_Roll	; use roll SFX for now	
-; ---------------------------------------------------------------------------
 
 Sonic_SpinDash:
 		btst	#0,spindash_flag(a0)			; is Spin Dash flag already set?
@@ -2516,3 +2532,67 @@ Sonic_Spindash_ResetScr:
 		bsr.w	Sonic_AnglePos				; ...we need to manually run some Sonic stuff
 		rts
 ; End of function Sonic_SpinDash
+
+Sonic_Peelout:
+		btst	#1,spindash_flag(a0)			; is Peel-Out currently being charged up?
+		bne.s	.charge_peelout				; if yes, branch to a different code section
+
+		; Peel-Out init 
+		cmpi.b	#id_LookUp,obAnim(a0)			; is Sonic in his looking-up animation?
+		bne.s	.nopeel					; if not, branch
+		btst	#bitUp,(v_jpadhold2).w ; is the Up button held?
+		beq.s	.nopeel					; if not, branch
+		moveq	#btnABC,d0				; are buttons ABC...
+		and.b	(v_jpadpress2).w,d0			; ...pressed?
+		beq.s	.nopeel					; if not, branch
+		cmpi.b	#id_LookUp,obAnim(a0)			; is Sonic in his looking-up animation?
+		bne.s	.nopeel					; if not, branch
+		bset	#1,spindash_flag(a0)			; set Peel-Out flag
+		clr.b	obAnim(a0)				; reset Sonic's animation
+		bclr	#5,obStatus(a0)				; clear pushing flag
+		addq.l	#4,sp					; skip rest in MdNormal
+		move.w	#sfx_PeelCharge,d0			; play Peel-Out charge sound
+		jmp	(QueueSound2).l				; play sound
+.nopeel:
+		rts
+; ===========================================================================
+
+.charge_peelout:
+		btst	#bitUp,(v_jpadhold2).w			; is the Up button STILL held?
+		beq.s	.release_peelout			; if not, release Peel-Out
+		
+		addi.w	#100,obInertia(a0)			; add 100 charge to Peel-Out speed per frame
+		move.w	(v_sonspeedmax).w,d0			; get Sonic's current max speed
+		add.w	d0,d0					; double it
+		cmpi.w	#$1000,d0				; did it exceed $1000? (can only happen with shoes)
+		ble.s	.nosafety				; if not, branch
+		move.w	#$1000,d0				; make sure speed never exceeds $1000 for safety
+.nosafety:
+		cmp.w	obInertia(a0),d0			; did charge speed exceed maximum?
+		bge.s	.nocap					; if not, branch
+		move.w	d0,obInertia(a0)			; cap max speed
+.nocap:
+		bsr.w	Sonic_LevelBound			; keep checking for level boundaries
+		bsr.w	Sonic_AnglePos				; make sure Sonic uses the correct angled sprites on a slope
+		move.w	#$60,(v_lookshift).w			; reset looking up/down
+		bclr	#5,obStatus(a0)				; keep pushing flag cleared
+		addq.l	#4,sp					; skip rest in MdNormal
+		rts						; don't do anything else
+; ===========================================================================
+
+.release_peelout:
+		cmpi.w	#$600,obInertia(a0)			; was minimum speed reached?
+		bge.s	.speedok				; if yes, branch
+		clr.w	obInertia(a0)				; kill whatever little speed we've built up
+		bclr	#1,spindash_flag(a0)			; reset Peel-Out flag
+		move.w	#sfx_PeelStop,d0			; cancel the Peel-Out charge sound
+		jmp	(QueueSound2).l
+.speedok:
+		btst	#0,obStatus(a0)				; is Sonic looking to the left?
+		beq.s	.notleft				; if not, branch
+		neg.w	obInertia(a0)				; negate defined speed
+.notleft:
+		bclr	#1,spindash_flag(a0)			; reset Peel-Out flag
+		move.w	#sfx_PeelRelease,d0			; set Peel-Out release sound
+		jmp	(QueueSound2).l				; play it
+; End of function Sonic_Peelout

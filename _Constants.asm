@@ -447,6 +447,14 @@ spec__First:		equ $D0
 sfx_Waterfall:		equ ((ptr_sndD0-SpecSoundIndex)/4)+spec__First
 spec__Last:		equ ((ptr_specend-SpecSoundIndex-4)/4)+spec__First
 
+; Extra sound effects
+ext__First:		equ $D1
+sfx_SpinDash:		equ ((ptr_sndD1-ExtSoundIndex)/4)+ext__First
+sfx_PeelCharge:		equ ((ptr_sndD2-ExtSoundIndex)/4)+ext__First
+sfx_PeelRelease:	equ ((ptr_sndD3-ExtSoundIndex)/4)+ext__First
+sfx_PeelStop:		equ ((ptr_sndD4-ExtSoundIndex)/4)+ext__First
+ext__Last:		equ ((ptr_extend-ExtSoundIndex-4)/4)+ext__First
+
 ; Sound commands
 flg__First:		equ $E0
 bgm_Fade:		equ ((ptr_flgE0-Sound_ExIndex)/4)+flg__First
@@ -625,7 +633,8 @@ ArtTile_HUDRings:		equ ArtTile_HUD+$30
 
 ArtTile_Sonic:			equ $780
 ArtTile_Points:			equ $797
-ArtTile_Lamppost:		equ $7A0
+ArtTile_Lamppost:		equ $D800/tile_size		; =$6C0 (changed from $7A0 to make room for the Spin Dash dust)
+ArtTile_SpinDust:		equ $F400/tile_size		; = $7A0
 ArtTile_Ring:			equ $7B2
 ArtTile_Lives_Counter:		equ $7D4
 ArtTile_Lives_Counter_Num:	equ ArtTile_Lives_Counter+9

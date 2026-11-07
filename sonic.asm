@@ -4292,6 +4292,9 @@ Map_LWall:	include	"_maps/Wall of Lava.asm"
 ; ===========================================================================
 ; >>> Main Sonic player object
 		include	"_incObj/01 Sonic.asm"
+		include	"_incObj/05 SpinDust.asm"
+		include	"_maps/SpinDust.asm"
+		include	"_maps/SpinDust - Dynamic Gfx Script.asm"
 
 
 ; ===========================================================================
@@ -4470,6 +4473,9 @@ Map_Sonic:	include	"_maps/Sonic.asm"
 SonicDynPLC:	include	"_maps/Sonic - Dynamic Gfx Script.asm"
 
 Art_Sonic:	binclude	"artunc/Sonic.unc"
+		even
+
+Art_SpinDust:	binclude	"artunc/SpinDust.unc"
 		even
 
 ; ---------------------------------------------------------------------------

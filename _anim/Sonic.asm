@@ -97,6 +97,26 @@ fr_SpinDash4:	equ fr_SpinDash3+1
 fr_SpinDash5:	equ fr_SpinDash4+1
 fr_SpinDash6:	equ fr_SpinDash5+1
 
+fr_Figure8_11:	equ fr_SpinDash6+1
+fr_Figure8_12:	equ fr_Figure8_11+1
+fr_Figure8_13:	equ fr_Figure8_12+1
+fr_Figure8_14:	equ fr_Figure8_13+1
+
+fr_Figure8_21:	equ fr_Figure8_14+1
+fr_Figure8_22:	equ fr_Figure8_21+1
+fr_Figure8_23:	equ fr_Figure8_22+1
+fr_Figure8_24:	equ fr_Figure8_23+1
+
+fr_Figure8_31:	equ fr_Figure8_24+1
+fr_Figure8_32:	equ fr_Figure8_31+1
+fr_Figure8_33:	equ fr_Figure8_32+1
+fr_Figure8_34:	equ fr_Figure8_33+1
+
+fr_Figure8_41:	equ fr_Figure8_34+1
+fr_Figure8_42:	equ fr_Figure8_41+1
+fr_Figure8_43:	equ fr_Figure8_42+1
+fr_Figure8_44:	equ fr_Figure8_43+1
+
 
 ; ---------------------------------------------------------------------------
 ; Animation script - Sonic
@@ -143,6 +163,7 @@ id_Null:	sonani	SonAni_Null	; $1C
 id_Float3:	sonani	SonAni_Float3	; $1D
 id_Float4:	sonani	SonAni_Float4	; $1E
 id_SpinDash:	sonani	SonAni_SpinDash	; $1F
+id_Figure8:	sonani	SonAni_Figure8
 
 ; ---------------------------------------------------------------------------
 ; --- Special animations (walk/run/roll/push) ---
@@ -325,5 +346,10 @@ SonAni_SpinDash:
 		dc.b 0
 		dc.b fr_SpinDash1, fr_SpinDash2, fr_SpinDash1, fr_SpinDash3, fr_SpinDash1
 		dc.b fr_SpinDash4, fr_SpinDash1, fr_SpinDash5, fr_SpinDash1, fr_SpinDash6
+		dc.b afEnd
+		even
+
+SonAni_Figure8:	dc.b $FF
+		dc.b fr_Figure8_11, fr_Figure8_12, fr_Figure8_13, fr_Figure8_14, afEnd, afEnd
 		dc.b afEnd
 		even
